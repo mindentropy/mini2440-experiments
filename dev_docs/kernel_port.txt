@@ -1,0 +1,16 @@
+Kernel Porting Documentation
+============================
+
+Introduction:
+------------
+
+This exercise involves creating a new hypothetical board same as the the mini2440
+board and porting the linux kernel to it. It is intended to learn about kernel porting.
+
+Board description:
+-----------------
+Board is same as the mini2440 board with the S3C2440 processor.
+
+Steps to port:
+--------------
+
