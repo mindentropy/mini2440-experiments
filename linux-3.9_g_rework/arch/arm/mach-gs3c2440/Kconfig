@@ -1,0 +1,31 @@
+if ARCH_GS3C2440
+
+menu "Gautam s3c2440 soc support"
+comment "gs3c2440 soc support"
+
+config CPU_GS3C2440
+	bool "GSAMSUNG S3C2440"
+	default y
+	select CPU_ARM920T
+	select CPU_LLSERIAL_GS3C2440
+	select GS3C2440_CLOCK
+	help
+		Support for custom GS3C2440 Mobile cpu based systems
+
+config MACH_MINIG2440
+	bool "G mini2440 development board"
+	select CPU_GS3C2440
+
+config GS3C2440_CLOCK
+	bool
+	help
+		Clock code for the GS3C2440.
+
+config 	CPU_LLSERIAL_GS3C2440
+	bool
+	help
+		Selected if there is a gs3c2440 serial low level
+		implementation needed.
+
+endmenu
+endif
