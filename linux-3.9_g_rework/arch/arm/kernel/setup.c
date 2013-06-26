@@ -456,6 +456,8 @@ void __init smp_setup_processor_id(void)
 		cpu_logical_map(i) = i == cpu ? 0 : i;
 
 	printk(KERN_INFO "Booting Linux on physical CPU 0x%x\n", mpidr);
+
+	early_printk("[GAUN] Booting Linux on physical CPU 0x%x\n",mpidr);
 }
 
 static void __init setup_processor(void)
@@ -749,6 +751,7 @@ void __init setup_arch(char **cmdline_p)
 {
 	struct machine_desc *mdesc;
 
+	printk(KERN_CRIT "[GAUN] Setting up processor\n");
 	setup_processor();
 	mdesc = setup_machine_fdt(__atags_pointer);
 	if (!mdesc)

@@ -67,10 +67,6 @@ config CPU_S3C2440
 	help
 	  Support for S3C2440 Samsung Mobile CPU based systems.
 
-config CPU_GS3C2440
-	bool "Gautam s3c2440"
-
-
 config CPU_S3C2442
 	bool "SAMSUNG S3C2442"
 	select CPU_ARM920T
@@ -580,18 +576,19 @@ config MACH_MINI2440
 	  available via various sources. It can come with a 3.5" or 7" touch LCD.
 
 
-config MACH_MINI2440_REWORK
-	bool "MINI2440 Rework development board"
-	select LEDS_CLASS
-	select LEDS_TRIGGERS
-	select LEDS_TRIGGER_BACKLIGHT
-	select NEW_LEDS
-	select S3C_DEV_NAND
-	select S3C_DEV_USB_HOST
-	select TOUCHSCREEN_S3C2410
-	select S3C_DEV_HWMON
-	help
-		Say Y here to select support for the MINI2440 REWORK board.
+#config MACH_MINI2440_REWORK
+#	bool "MINI2440 Rework development board"
+#	select LEDS_CLASS
+#	select LEDS_TRIGGERS
+#	select LEDS_TRIGGER_BACKLIGHT
+#	select NEW_LEDS
+#	select S3C_DEV_NAND
+#	select S3C_DEV_USB_HOST
+#	select TOUCHSCREEN_S3C2410
+#	select S3C_DEV_HWMON
+#	help
+#		Say Y here to select support for the MINI2440 REWORK board.
+
 
 config MACH_NEXCODER_2440
 	bool "NexVision NEXCODER 2440 Light Board"

@@ -556,8 +556,12 @@ asmlinkage void __init start_kernel(void)
 	softirq_init();
 	timekeeping_init();
 	time_init();
+	printk(KERN_CRIT "[GAUN] After time_init\n");
 	profile_init();
+	printk(KERN_CRIT "[GAUN] After profile_init\n");
 	call_function_init();
+	printk(KERN_CRIT "[GAUN] After call_function_init \n");
+
 	if (!irqs_disabled())
 		printk(KERN_CRIT "start_kernel(): bug: interrupts were "
 				 "enabled early\n");
@@ -582,7 +586,9 @@ asmlinkage void __init start_kernel(void)
 	 * to self-test [hard/soft]-irqs on/off lock inversion bugs
 	 * too:
 	 */
+	printk(KERN_CRIT "[GAUN] Before locking selftest\n");
 	locking_selftest();
+	printk(KERN_CRIT "[GAUN] After locking selftest\n");
 
 #ifdef CONFIG_BLK_DEV_INITRD
 	if (initrd_start && !initrd_below_start_ok &&

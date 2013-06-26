@@ -88,8 +88,9 @@ obj-$(CONFIG_MACH_SMDK2416)		+= mach-smdk2416.o
 
 obj-$(CONFIG_MACH_ANUBIS)		+= mach-anubis.o
 obj-$(CONFIG_MACH_AT2440EVB)		+= mach-at2440evb.o
-obj-$(CONFIG_MACH_MINI2440)		+= mach-mini2440.o
-obj-$(CONFIG_MACH_MINI2440_REWORK) += mach-mini2440_rework.o
+#obj-$(CONFIG_MACH_MINI2440)		+= mach-mini2440.o
+obj-$(CONFIG_MACH_MINI2440)		+= mach-mini2440_rework.o
+#obj-$(CONFIG_MACH_MINI2440_REWORK) += mach-mini2440_rework.o
 obj-$(CONFIG_MACH_NEXCODER_2440)	+= mach-nexcoder.o
 obj-$(CONFIG_MACH_OSIRIS)		+= mach-osiris.o
 obj-$(CONFIG_MACH_RX3715)		+= mach-rx3715.o

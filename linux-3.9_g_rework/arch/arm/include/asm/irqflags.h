@@ -28,6 +28,7 @@ static inline void arch_local_irq_enable(void)
 		:
 		:
 		: "memory", "cc");
+
 }
 
 static inline void arch_local_irq_disable(void)
@@ -65,6 +66,8 @@ static inline unsigned long arch_local_irq_save(void)
  */
 static inline void arch_local_irq_enable(void)
 {
+
+
 	unsigned long temp;
 	asm volatile(
 		"	mrs	%0, cpsr	@ arch_local_irq_enable\n"
@@ -73,6 +76,7 @@ static inline void arch_local_irq_enable(void)
 		: "=r" (temp)
 		:
 		: "memory", "cc");
+
 }
 
 /*

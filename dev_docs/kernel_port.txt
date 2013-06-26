@@ -9,8 +9,40 @@ board and porting the linux kernel to it. It is intended to learn about kernel p
 
 Board description:
 -----------------
-Board is same as the mini2440 board with the S3C2440 processor.
+Board is same as the mini2440 board with the S3C2440 processor. I am creating a new
+board(a machine type) called MINI2440_REWORK. This is a hypothetical board with the
+same mini2440 configuration. Later there might be plans to rework the board to test
+the port.
 
-Steps to port:
---------------
+Porting experience:
+------------------
+Initial step is to create defconfig with minimal definitions needed to boot.
 
+Next trying my hand on creating a MACHINE_START, MACHINE_END. Got an error saying 
+-> error: ‘MACH_TYPE_MINI2440_REWORK’ undeclared here (not in a function)
+To fix the error we have to create this machine type in arch/arm/tools/mach-types.
+
+machine_is_xxx->mini2440_rework	
+CONFIG_xxx -> MACH_MINI2440_REWORK 
+MACH_TYPE_xxx -> MINI2440_REWORK	
+number -> 4173
+
+*Note*: that we need to register a MACHINE_ID in arm linux website to get an ID.
+
+Cannot progress further with the new machine type as this requires bootloader
+modification. This is deferred right now as it being dangerous.
+
+To circumvent this, use the same MACHINE_ID but move the files relevant to
+mini2440 and write my own files. All files replacing it will have rework suffix.
+
+26/06/2013
+----------
+Created various dummy functions for mapping io, setting irq and time_init.
+Understanding of the flow is easier if read from the caller list [TODO: Update the function and file]
+
+Encountered calculating DELAY loops which calculates the time taken for a loop. It will used in
+udelay or mdelay. Or the jiffies would be used.[TODO: Update the exact function].
+
+References
+----------
+http://www.simtec.co.uk/products/SWLINUX/files/booting_article.html

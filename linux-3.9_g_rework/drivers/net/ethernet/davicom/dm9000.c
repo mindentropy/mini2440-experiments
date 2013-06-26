@@ -1394,6 +1394,8 @@ dm9000_probe(struct platform_device *pdev)
 
 	SET_NETDEV_DEV(ndev, &pdev->dev);
 
+	printk(KERN_CRIT "[GAUN] : %s\n",__FUNCTION__);
+
 	dev_dbg(&pdev->dev, "dm9000_probe()\n");
 
 	/* setup board info structure */
