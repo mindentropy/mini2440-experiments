@@ -57,6 +57,7 @@ static inline unsigned int s3c2416_get_pll(unsigned int pllval,
 	pdiv = (pllval >> S3C2416_PLL_PDIV_SHIFT) & S3C2416_PLL_PDIV_MASK;
 	sdiv = (pllval >> S3C2416_PLL_SDIV_SHIFT) & S3C2416_PLL_SDIV_MASK;
 
+
 	fvco = (uint64_t)baseclk * mdiv;
 	do_div(fvco, (pdiv << sdiv));
 

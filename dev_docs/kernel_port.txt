@@ -35,13 +35,93 @@ modification. This is deferred right now as it being dangerous.
 To circumvent this, use the same MACHINE_ID but move the files relevant to
 mini2440 and write my own files. All files replacing it will have rework suffix.
 
+*TODO: iotable_init vs ioremap
+
+
+map_io notes:
+-------------
+Setting a cpu is mandatory. Code for early_printk has to studied and reworked.
+
+irq notes:
+----------
+
+timer notes:
+------------
+
+clock notes:
+------------
+TODO: Implement your own clocking implementation to add the s3c2440 clocks to the
+clocking tree using the present code as reference. Read up on the clocking framework. --> Done.
+
+Nothing significantly difficult. Adding clk tree was simple. Calculation of the fclk and
+uclk had some stumbling blocks but nothing major. Note that the clocking framework
+is not implemented in this version.
+
+
+Terms:
+
+Pure functions:
+---------------
+Functions which do not have a side affect. Pure functions take return a value that is
+calculated based on given parameters and global memory, but cannot affect the value
+of any other global variable. Example given in the gcc documentation is strlen.
+Here the global memory is a string pointer. This is considered as global memory
+as the pointer is pointing to a global memory. The length is derived from the string
+provided and returned without effecting the string i.e. global memory.
+
+TCM -> Tightly Coupled Memory.
+-----------------------------
+Tightly coupled memory is used in ARM processors to provide low latency memory that can
+be used by processors without the unpredictability which is a feature of caches. This can
+be used to hold critical routines such as interrupt handling routines or real time
+tasks where the interdeterminacy of caches is undesirable. In addition it can hold scratch
+pad data, data types whose locality properties are unsuitable for caching and critical
+data structures such as interrupt stacks. TCM comes under level 1 memory system.
+For more info refer ARM info center.
+
+
+PLL
+---
+Components include phase detector and variable frequency generator. PLL compares the input
+signal and compares the phase using the phase detector and adjusts its variable frequency
+generator to match the input signal. Once the variable frequency generator matches the 
+input signal the frequency is said to be locked. There is a charge pump which provides
+the required voltage to the variable frequency generator which can be a Vco(Voltage controlled
+oscillator).
+
+Clock Oscillator confusion in mini2440.
+---------------------------------------
+In the datasheet there is a mention saying that until the PLL gets stabilized the input for
+FCLK is fed directly from the oscillator. The question arises as to whether the oscillator
+output is a sine wave or a square wave. Turns out the oscillator has schmitt trigger to clean
+the signal and generate a square wave. Hence the output of the oscillator is directly fed to
+the processor. While reading the schematic I made a mistake of reading the X2 as an oscillator.
+It is just a 12Mhz crystal which is connected to the oscillator. The oscillator is present in
+the processor. Hence inside the processor they would generally have signal conditioning circuitry
+to generate a clean square wave signal. The PLL is used to generate variable frequency either to
+multiply or divide the frequency and needs an accurate input frequency from the oscillator.
+
+
+Log:
+
 26/06/2013
 ----------
 Created various dummy functions for mapping io, setting irq and time_init.
-Understanding of the flow is easier if read from the caller list [TODO: Update the function and file]
+Understanding of the flow is easier if read from the caller list init/main.c in start_kernel(..)
+function. The start_kernel function is the C entry point.
 
 Encountered calculating DELAY loops which calculates the time taken for a loop. It will used in
 udelay or mdelay. Or the jiffies would be used.[TODO: Update the exact function].
+
+27/06/2013
+----------
+Modification of each of the 4 functions to have my own custom functions. Modifications of 
+map_io/irq/timer.
+
+28/06/2013
+----------
+Modification of s3c24xx code i.e. from board specific to cpu specific. All concentration will be
+on reworking s3c2440 cpu code for better understanding.
 
 References
 ----------

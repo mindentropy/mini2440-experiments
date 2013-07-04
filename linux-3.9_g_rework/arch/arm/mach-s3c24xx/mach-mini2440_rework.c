@@ -3,21 +3,37 @@
  */
 
 
+#include <linux/init.h>
+#include <linux/module.h>
+#include <linux/interrupt.h>
 #include <linux/kernel.h>
 #include <linux/types.h>
 #include <linux/types.h>
-#include <linux/init.h>
 #include <linux/gpio.h>
 #include <linux/serial_core.h>
+//#include <linux/platform_device.h>
+//#include <linux/io.h>
 
+#include <mach/hardware.h>
+#include <mach/regs-gpio.h>
 #include <asm/mach/arch.h>
 #include <asm/mach/map.h>
 #include <asm/mach-types.h>
+#include <asm/setup.h>
+#include <asm/system_info.h>
+#include <asm/system_misc.h>
+
 #include "common.h"
 #include <plat/cpu.h>
+#include <plat/cpu_rework.h>
+
+//#include <plat/cpu-freq.h>
 #include <plat/s3c2410.h>
 #include <plat/s3c244x.h>
 #include <plat/regs-serial.h>
+#include <mach/regs-clock.h>
+#include <asm/io.h>
+#include <plat/pll.h>
 
 /* Default control,line and fifo control reg values */
 
@@ -68,21 +84,26 @@ static struct s3c2410_uartcfg mini2440_rework_uartcfgs[] __initdata = {
 	},
 };
 
+#define s3c24xx_read_idcode() __raw_readl(S3C2410_GSTATUS1)
+
 static void __init mini2440_rework_map_io(void) {
 	early_printk("[GAUN] map_io\n");
 
 	s3c24xx_init_io(mini2440_rework_iodesc,ARRAY_SIZE(mini2440_rework_iodesc));
-	s3c24xx_init_clocks(12000000); //Init the clock to 12Mhz Crystal.
+
+	pr_err("mpllcon : %x\n",__raw_readl(S3C2410_MPLLCON));
+
+	s3c24xx_init_clocks_rework(12000000); //Init the clock to 12Mhz Crystal.
+
+	pr_crit("[GAUN] cpu architecture :%d, idcode : %x\n",
+							cpu_architecture(),s3c24xx_read_idcode());
+
+
 	s3c244x_init_uarts(mini2440_rework_uartcfgs,ARRAY_SIZE(mini2440_rework_uartcfgs));
 }
 
 static void __init mini2440_rework_init(void) {
 	early_printk("[GAUN] machine_init\n");
-}
-
-
-static void __init init_mini2440_time(void) {
-	early_printk("[GAUN] time_init\n");
 }
 
 static void __init init_mini2440_restart(char mode,const char *cmd) {

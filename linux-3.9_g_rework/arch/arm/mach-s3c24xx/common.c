@@ -45,6 +45,7 @@
 #include <plat/regs-serial.h>
 
 #include <plat/cpu.h>
+#include <plat/cpu_rework.h>
 #include <plat/devs.h>
 #include <plat/clock.h>
 #include <plat/s3c2410.h>
@@ -54,6 +55,7 @@
 #include <plat/s3c2443.h>
 #include <plat/cpu-freq.h>
 #include <plat/pll.h>
+#include <plat/s3c244x_rework.h>
 
 /* table of supported CPUs */
 
@@ -99,7 +101,8 @@ static struct cpu_table cpu_ids[] __initdata = {
 		.idcode		= 0x32440001,
 		.idmask		= 0xffffffff,
 		.map_io		= s3c2440_map_io,
-		.init_clocks	= s3c244x_init_clocks,
+		//.init_clocks	= s3c244x_init_clocks,
+		.init_clocks = s3c244x_init_clocks_rework,
 		.init_uarts	= s3c244x_init_uarts,
 		.init		= s3c2440_init,
 		.name		= name_s3c2440a
@@ -232,9 +235,14 @@ void __init s3c24xx_init_io(struct map_desc *mach_desc, int size)
 	} else {
 		samsung_cpu_id = s3c24xx_read_idcode_v4();
 	}
-	s3c24xx_init_cpu();
 
-	s3c_init_cpu(samsung_cpu_id, cpu_ids, ARRAY_SIZE(cpu_ids));
+	s3c24xx_init_cpu();
+	
+	s3c_init_cpu_rework(samsung_cpu_id,
+						cpu_ids,
+						ARRAY_SIZE(cpu_ids));
+
+/*	s3c_init_cpu(samsung_cpu_id, cpu_ids, ARRAY_SIZE(cpu_ids));*/
 }
 
 /* Serial port registrations */

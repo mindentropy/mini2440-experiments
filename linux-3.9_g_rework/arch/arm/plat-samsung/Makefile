@@ -11,11 +11,11 @@ obj-				:=
 
 # Objects we always build independent of SoC choice
 
-obj-y				+= init.o cpu.o
+obj-y				+= init.o cpu.o rework_init.o
 obj-$(CONFIG_ARCH_USES_GETTIMEOFFSET)   += time.o
 obj-$(CONFIG_S5P_HRT) 		+= s5p-time.o
 
-obj-$(CONFIG_SAMSUNG_CLOCK)	+= clock.o
+obj-$(CONFIG_SAMSUNG_CLOCK)	+= clock.o clock_rework.o
 obj-$(CONFIG_SAMSUNG_CLOCK)	+= pwm-clock.o
 
 obj-$(CONFIG_SAMSUNG_CLKSRC)	+= clock-clksrc.o
