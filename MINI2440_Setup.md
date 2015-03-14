@@ -1,0 +1,184 @@
+Assuming a ubuntu setup.
+
+
+RootFS creation using debian multistrap. See simple\_config to create a simple
+multistrap configuration.
+
+
+Use tar with the following options --> -cpjvf --numeric-owner
+
+  * c Create
+  * p Preserve permissions
+  * j bz2.
+  * v verbose.
+  * f use file archive ie. the name of the file.
+
+
+
+tar -cpjvf `<filename.tar.bz2`> . --numeric-owner
+
+Extraction is the same. Make sure you are using sudo as the file permissions usually will have
+root user permissions and the permissions are preserved.
+
+Creation of a Emdebian rootfs.
+  1. sudo debootstrap --foreign --arch armel `<debian_release_codename`> `<rootfs_directory`> http://ftp.debian.org/debian/
+  1. Do -> cp /usr/bin/qemu-static-arm `<rootfs_directory`>/usr/bin
+  1. Get a root environment. Do -> sudo -i
+  1. To do a second stage install. Do -> LC\_ALL=C LANGUAGE=C LANG=C chroot debian\_armel\_wheezy /debootstrap/debootstrap --second-stage
+  1. To trigger post install scripts. Do -> LC\_ALL=C LANGUAGE=C LANG=C chroot emdebian\_rootfs\_wheezy\_test dpkg --configure -a
+
+Reference http://wiki.debian.org/EmDebian/CrossDebootstrap#QEMU.2Fdebootstrap_approach
+
+Copy fstab,udev.conf,udev.rules,ts.conf files from pengutronix to the rootfs sdcard.
+
+
+### Reference inittab ###
+id:5:initdefault:
+
+T1::sysinit:/bin/mount -t proc proc /proc <br />
+T2::sysinit:/bin/mount -o remount,rw / <br />
+T3::sysinit:/bin/mkdir -p /dev/pts <br />
+T4::sysinit:/bin/hostname -F /etc/hostname <br />
+
+T5::sysinit:/etc/init.d/rcS <br />
+T6::sysinit:/bin/mount -a <br />
+#T7::sysinit:/bin/mount -t sysfs sys /sys <br />
+
+T0::respawn:/sbin/getty -L ttySAC0 38400 vt100 <br />
+
+### Reference passwd ###
+
+root::0:0:root:/root:/bin/sh <br />
+bin:x:1:1:bin:/dev/null:/bin/false <br />
+nobody:x:99:99:Unprivileged user:/dev/null:/bin/false <br />
+
+### Reference group ###
+root:x:0 <br />
+bin:x:1 <br />
+nogroup:x:99 <br />
+floppy:x:1000: <br />
+cdrom:x:1001: <br />
+tape:x:1002: <br />
+lp:x:1003: <br />
+tty:x:1004: <br />
+video:x:1005: <br />
+kmem:x:1006: <br />
+audio:x:1007: <br />
+disk:x:1008: <br />
+dialout:x:1009: <br />
+crontab:x:1010: <br />
+
+
+### Reference fstab ###
+# UNCONFIGURED FSTAB FOR BASE SYSTEM
+
+devpts /dev/pts	devpts	defaults  0	0
+none	/tmp			tmpfs	defaults,mode=1777,uid=0,gid=0	0 0 <br />
+none	/sys			sysfs	defaults			0 0 <br />
+debugfs	/sys/kernel/debug	debugfs	defaults			0 0 <br />
+usbfs	/proc/bus/usb		usbfs	devgid=14,devmode=0660		0 0 <br />
+
+none	/var/log		tmpfs	defaults,mode=0755,uid=0,gid=0	0 0 <br />
+none	/run		tmpfs	defaults,mode=0755,uid=0,gid=0	0 0 <br />
+none	/run/lock		tmpfs	defaults,mode=0755,uid=0,gid=0	0 0 <br />
+none	/var/tmp		tmpfs	defaults,mode=1777,uid=0,gid=0	0 0 <br />
+
+### /etc/securetty ###
+Add ttySAC0 entry at the end of securetty file.
+
+Copy relevant files like udev rules from pengutronix folders.
+
+### Kernel Compilation ###
+Get the kernel from kernel.org. If the patch from pengutronix is 3.9.1(i.e. patch.3.9.1.bz2) download the
+3.9.0 kernel and the patch will patch the version to 3.9.1. Also if the patches directory shows 3.9 then
+download the 3.9.0 kernel.
+
+### Using quilt to apply the 'series' patch. ###
+Create a sym link called patches pointing to ../OSELAS.BSP-Pengutronix-Mini2440/configs/platform-friendlyarm-mini2440/patches/linux-3.9/ in the
+linux directory. <br />
+Create a sym link called series pointing to ../OSELAS.BSP-Pengutronix-Mini2440/configs/platform-friendlyarm-mini2440/patches/linux-3.9/series in
+the linux directory.
+
+To apply the series of patches do -> quilt push -av
+
+Copy kernelconfig to the defconfig
+Eg:
+cp ../OSELAS.BSP-Pengutronix-Mini2440/configs/platform-friendlyarm-mini2440/kernelconfig-3.9 arch/arm/configs/mini2440\_defconfig
+
+
+### Kernel compilation ###
+CROSS\_COMPILE=arm-linux-gnueabi- ARCH=arm make mini2440\_defconfig
+
+CROSS\_COMPILE=arm-linux-gnueabi- ARCH=arm make menuconfig
+
+### Kernel config ###
+
+Device Drivers->Graphics Support->Bootup logo check.
+> -> Direct Rendering Manager.
+> -> Lowlevel video output switch controls.
+> > ->Console display driver support -> Framebuffer console support.
+> > Optional
+> > > Framebuffer console rotation.
+
+> > Mini 4x6 font. (For smaller font).
+
+Device Drivers->Graphics Support->Support for framebuffer devices.
+
+> -> S3C2410 LCD framebuffer support.
+> -> S3C2410 lcd debug messages.
+
+Device Drivers->Character Devices->Enable TTY.
+> -> Virtual Terminal.
+File Systems-> Enable ext2,ext3
+Network support -> Networking support -> IP: BOOTP support.
+> > IP: RARP support.
+
+CROSS\_COMPILE=arm-linux-gnueabi- ARCH=arm  INSTALL\_MOD\_PATH=/mnt/arm make <br />
+CROSS\_COMPILE=arm-linux-gnueabi- ARCH=arm  INSTALL\_MOD\_PATH=/mnt/arm make uImage <br />
+CROSS\_COMPILE=arm-linux-gnueabi- ARCH=arm  INSTALL\_MOD\_PATH=/mnt/arm make modules\_install <br />
+
+
+### uboot options: ###
+bootargs=mini2440=5tb rootfstype=ext3 root=/dev/mmcblk0p2 rw bootdelay=rootwait ip=dhcp console=tty0 --> For lcd console output. <br />
+bootargs=mini2440=5tb rootfstype=ext3 root=/dev/mmcblk0p2 rw bootdelay=rootwait ip=dhcp console=ttySAC0 --> For serial output. <br />
+
+
+### Bootcmd for sdcard boot: ###
+
+bootcmd=mmcinit ; ext2load mmc 0:1 0x31000000 uImage ; bootm 0x31000000
+
+
+### Bootcmd for tftpboot: ###
+
+bootcmd=tftpboot 0x31000000 192.168.1.101:uImage ; bootm 0x31000000
+
+
+### nfs setup ###
+mkdir /export
+mkdir /export/fs
+mkdir /export/kernel
+
+### /etc/exports ###
+
+/export 192.168.1.0/24(rw,fsid=0,insecure,no\_subtree\_check,async)
+/export/fs 192.168.1.0/24(rw,fsid=0,insecure,no\_subtree\_check,async,no\_root\_squash)
+/export/kernel 192.68.1.0/24(rw,fsid=0,insecure,no\_subtree\_check,async)
+
+
+### Bootcmd for nfs ###
+setenv bootcmd nfs 0x31000000 192.168.1.x:/nfs/rootfs/boot/uImage \; bootm
+setenv bootargs console=ttySAC0,115200 root=/dev/nfs nfsroot\=192.168.1.x:/nfs/rootfs rw ip=dhcp mini2440=5tb
+
+NOTE: Do not use environment variable for NFS configuration.
+
+
+### NFS configuration which worked: ###
+/nfs/rootfs	192.168.1.0/24(rw,fsid=0,insecure,no\_subtree\_check,async,no\_root\_squash)
+
+
+For ERROR cannot umount add mini2440 to /etc/hosts in your host.
+
+For earlyprintk messages. Enable in the kernel. Also put a earlyprintk in the bootargs
+For eg:
+
+setenv bootargs console=ttySAC0,115200 root=/dev/nfs nfsroot\=192.168.1.x:/nfs/rootfs rw ip=dhcp mini2440=5tb earlyprintk
